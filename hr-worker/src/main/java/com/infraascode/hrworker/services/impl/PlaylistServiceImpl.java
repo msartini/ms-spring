@@ -1,6 +1,7 @@
 package com.infraascode.hrworker.services.impl;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,14 +31,18 @@ public class PlaylistServiceImpl implements PlaylistService {
 
 	@Override
 	public Playlist create(Playlist playlist) {
+		
 		playlist.setId(UUID.randomUUID());
 		
-		Playlist parent = 
-				this.playlistRepository
-					.findById(playlist.getParent().getId())
-					.orElseThrow(() -> new IllegalArgumentException("Playlist Pai inexistente."));
+		if (! Objects.isNull(playlist.getParent()) ) {
+			Playlist parent = 
+					this.playlistRepository
+						.findById(playlist.getParent().getId())
+						.orElseThrow(() -> new IllegalArgumentException("Playlist Pai não existe."));
+			
+			playlist.setParent(parent);
+		}
 		
-		playlist.setParent(parent);
 		
 		return this.playlistRepository.save(playlist);
 	}
